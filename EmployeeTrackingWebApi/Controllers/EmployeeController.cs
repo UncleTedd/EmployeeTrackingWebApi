@@ -48,37 +48,30 @@ public class EmployeeController : Controller
     }
     
     [HttpGet("{id}")]
-    public Employee GetSingleEmployee(int id)
+    public async Task<ActionResult<Employee>> GetSingleEmployee(int id)
     {
-        return _employeeService.GetSingleEmployee(id);
+        var res = await _employeeService.GetSingleEmployee(id);
+        return Ok(res);
     }
     
     [HttpPost]
-    public Employee AddEmployee(Employee employee)
+    public async Task<ActionResult<Employee>> AddEmployee(Employee employee)
     {
-        _employeeService.AddEmployee(employee);
-        var result = _employeeService.Find(x => x.Id == employee.Id);
-        if (result is null)
-            return null;
-        return result;
-        
+        var res= await _employeeService.AddEmployee(employee);
+        return Ok(res);
     }
     [HttpDelete]
     public int DeleteEmployee(int id)
     {
-        var res = Employees.Find(x => x.Id == id);
-        if (res is null)
-            NotFound();
-        return Employees.Remove(res) ? 1 : 0;
+        return _employeeService.DeleteEmployee(id); 
 
     }
     
     [HttpPut("{id}")]
-    public Employee UpdateEmployee(int id, Employee request)
+    public async Task<ActionResult<Employee>> UpdateEmployee(int id, Employee request)
     {
-        _employeeService.UpdateEmployee(id, request);
-        var result = Employees.Find(x => x.Id == id);
-        return result;
+        var result = await _employeeService.UpdateEmployee(id, request);
+        return Ok(result);
 
     }
     

@@ -8,12 +8,11 @@ public class ShiftController : Controller
     
     public DateTime StartShift(int employeeId)
     {
-        employee.Shifts.Add(new Shifts()
+        employee.Shifts.Add(new Shifts
         {
-            Id = employeeId,
             StartShift = DateTime.Now,
-            
-            
+            EndShift = null,
+            TotalHoursWorked = 0,
         });
         return DateTime.Now;
     }

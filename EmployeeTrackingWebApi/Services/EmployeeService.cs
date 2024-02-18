@@ -42,43 +42,42 @@ public class EmployeeService : IEmployeeService
         }
 
     };
-    public  async Task<ActionResult<List<Employee>>> GetAllEmployee()
+    public  async Task<List<Employee>> GetAllEmployee()
     {
         var result = await _context.Employees.ToListAsync();
-
+        return result;
 
     }
 
-    public Task<ActionResult<List<Position>>> GetAllPositions()
+    public List<Position> GetAllPositions()
     {
         var result = Enum.GetValues(typeof(Position)).Cast<Position>().ToList();
-        //var result = (List<Position>)Enum.GetValues(typeof(Position));
+        
         return result;
         
         // var res = _context.Employees.
     }
 
-    public async Task<ActionResult<Employee>> AddEmployee(Employee employee)
+    public async Task<Employee> AddEmployee(Employee employee)
     {
         _context.Add(employee);
-        var result = await _context.Find(x => x.Id == employee.Id);
-        return result;
-
+        await _context.SaveChangesAsync();
+        return await _context.Employees.FirstAsync(x => x.Id == employee.Id);
     }
 
     
 
-    public async Task<ActionResult<Employee>> UpdateEmployee(int id, Employee request)
+    public async Task<Employee> UpdateEmployee(int id, Employee request)
     {
-        var employeeToChange = Employees.Find(x => x.Id == id);
+        var employeeToChange = await _context.Employees.FindAsync(id);
         if (employeeToChange is null)
             return null;
-        employeeToChange.Id = request.Id;
         employeeToChange.FirstName = request.FirstName;
         employeeToChange.LastName = request.LastName;
         employeeToChange.FatherName = request.FatherName;
         employeeToChange.Position = request.Position;
 
+        await _context.SaveChangesAsync();
         return employeeToChange;
     }
 
@@ -92,9 +91,9 @@ public class EmployeeService : IEmployeeService
 
     }
 
-    public Employee GetSingleEmployee(int id)
+    public async Task<Employee> GetSingleEmployee(int id)
     {
-        var result = Employees.Find(x=>x.Id == id);
+        var result = await _context.Employees.FindAsync(id);
         return result;
     }
 }
