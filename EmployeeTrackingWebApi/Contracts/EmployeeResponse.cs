@@ -1,6 +1,6 @@
-namespace EmployeeTrackingWebApi.Models;
+namespace EmployeeTrackingWebApi.Contracts;
 
-public class Employee
+public class EmployeeResponse
 {
     public int  Id { get; set; }
     public string FirstName { get; set; }
@@ -8,8 +8,5 @@ public class Employee
     public string FatherName { get; set; }
     public Position Position { get; set; }
 
-    public List<Shifts> Shifts { get; set; } = new();
-
-
-
+    public List<ShiftResponse> Shifts { get; set; } = new();
 }

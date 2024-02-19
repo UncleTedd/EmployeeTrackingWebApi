@@ -1,3 +1,4 @@
+using System.Xml.Linq;
 using EmployeeTrackingWebApi.Contracts;
 using EmployeeTrackingWebApi.DbContext;
 using EmployeeTrackingWebApi.Models;
@@ -16,38 +17,54 @@ public class EmployeeService : IEmployeeService
         _context = context;
     }
     
-    public static List<Employee> Employees = new()
+    // public static List<Employee> Employees = new()
+    // {
+    //     new Employee()
+    //     {
+    //         Id = 1,
+    //         FirstName = "Osim",
+    //         LastName = "GUlakov",
+    //         FatherName = "Akbarovich",
+    //         Position = Position.Engineer
+    //     },
+    //     new Employee()
+    //     {
+    //         Id = 2,
+    //         FirstName = "Aziz",
+    //         LastName = "Gulakov",
+    //         FatherName = "Akbarovich",
+    //         Position = Position.Manager
+    //     },
+    //     new Employee()
+    //     {
+    //         Id = 3,
+    //         FirstName = "Sam",
+    //         LastName = "Gulakov",
+    //         FatherName = "Akbarovich",
+    //         Position = Position.Tester
+    //     }
+    //
+    // };
+    public  async Task<List<EmployeeResponse>> GetAllEmployee()
     {
-        new Employee()
+        var result = await _context.Employees.Include(x=> x.Shifts).ToListAsync();
+       return result.Select(x => new EmployeeResponse
         {
-            Id = 1,
-            FirstName = "Osim",
-            LastName = "GUlakov",
-            FatherName = "Akbarovich",
-            Position = Position.Engineer
-        },
-        new Employee()
-        {
-            Id = 2,
-            FirstName = "Aziz",
-            LastName = "Gulakov",
-            FatherName = "Akbarovich",
-            Position = Position.Manager
-        },
-        new Employee()
-        {
-            Id = 3,
-            FirstName = "Sam",
-            LastName = "Gulakov",
-            FatherName = "Akbarovich",
-            Position = Position.Tester
-        }
-
-    };
-    public  async Task<List<Employee>> GetAllEmployee()
-    {
-        var result = await _context.Employees.ToListAsync();
-        return result;
+            Id = x.Id,
+            FirstName = x.FirstName,
+            LastName = x.LastName,
+            FatherName = x.FatherName,
+            Position = x.Position,
+            Shifts = x.Shifts.Select(y => new ShiftResponse
+            {
+                Id = y.Id,
+                StartShift = y.StartShift,
+                EndShift = y.EndShift,
+                TotalHoursWorked = 0
+            }).ToList()
+        }).ToList();
+        
+        
 
     }
 
@@ -105,4 +122,31 @@ public class EmployeeService : IEmployeeService
         var result = await _context.Employees.FindAsync(id);
         return result;
     }
+
+    public async Task<int> StartShift(StartShiftRequest request)
+    {
+        var id = request.Id;
+        var result = await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
+        result.Shifts.Add(new Shifts
+        {
+            Id = 0,
+            StartShift = DateTime.Now,
+            EndShift = null,
+            TotalHoursWorked = 0,
+        });
+        
+        return await _context.SaveChangesAsync();
+        
+    }
+
+    public async Task<int> EndShift(EndShiftRequest request)
+    {
+        var id = request.Id;
+        var result = await _context.Employees.Include(x=>x.Shifts).FirstOrDefaultAsync(x => x.Id == id);
+        var shift = result.Shifts.FirstOrDefault(x => x.EndShift == null);
+        shift.EndShift = request.EndShift;
+        return await _context.SaveChangesAsync();
+    }
+
+    
 }

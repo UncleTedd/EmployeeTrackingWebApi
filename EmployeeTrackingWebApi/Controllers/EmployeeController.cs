@@ -43,7 +43,7 @@ public class EmployeeController : Controller
     //
     // };
     [HttpGet]
-    public async Task<ActionResult<List<Employee>>> GetAllEmployee()
+    public async Task<ActionResult<List<EmployeeResponse>>> GetAllEmployee()
     {
         return await _employeeService.GetAllEmployee();
     }
@@ -74,6 +74,22 @@ public class EmployeeController : Controller
         var result = await _employeeService.UpdateEmployee(id, request);
         return Ok(result);
 
+    }
+    // [Route("[StartShift]")]
+    [HttpPost("startShift")]
+    public async Task<ActionResult<Employee>> StartShift([FromBody]StartShiftRequest request)
+    {
+        var res = await _employeeService.StartShift(request);
+        return Ok(res);
+    }
+    
+    
+    // [Route("[EndShift]")]
+    [HttpPost("endShift")]
+    public async Task<ActionResult<Employee>> EndShift([FromBody]EndShiftRequest request)
+    {
+        var res = await _employeeService.EndShift(request);
+        return Ok(res);
     }
     
 }

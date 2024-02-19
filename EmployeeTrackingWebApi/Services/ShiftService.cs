@@ -11,12 +11,14 @@ public class ShiftService : IShiftService
         _context = context;
     }
     
-    public DateTime StartShift()
+    
+    
+    public DateTime StartShift(int id)
     {
         return DateTime.Now;
     }
 
-    public DateTime EndShift()
+    public DateTime EndShift(int id)
     {
         return DateTime.Now;
     }

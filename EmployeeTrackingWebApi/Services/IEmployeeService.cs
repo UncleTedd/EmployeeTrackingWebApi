@@ -6,7 +6,7 @@ namespace EmployeeTrackingWebApi.Services;
 
 public interface IEmployeeService
 {
-    Task<List<Employee>> GetAllEmployee();
+    Task<List<EmployeeResponse>> GetAllEmployee();
     Task<Employee> GetSingleEmployee(int id);
     List<Position> GetAllPositions();
     Task<Employee> AddEmployee(CreateEmployeeRequest employee);
@@ -14,4 +14,6 @@ public interface IEmployeeService
 
     Task<int> DeleteEmployee(int id);
 
+    Task<int> StartShift(StartShiftRequest request);
+    Task<int> EndShift(EndShiftRequest request);
 }
