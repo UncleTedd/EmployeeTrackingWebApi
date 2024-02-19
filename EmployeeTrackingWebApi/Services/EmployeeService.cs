@@ -16,7 +16,7 @@ public class EmployeeService : IEmployeeService
     {
         _context = context;
     }
-    
+
     // public static List<Employee> Employees = new()
     // {
     //     new Employee()
@@ -45,57 +45,42 @@ public class EmployeeService : IEmployeeService
     //     }
     //
     // };
-    public  async Task<List<EmployeeResponse>> GetAllEmployee()
+    public async Task<List<EmployeeResponse>> GetAllEmployee()
     {
-        var result = await _context.Employees.Include(x=> x.Shifts).ToListAsync();
-       return result.Select(x => new EmployeeResponse
-        {
-            Id = x.Id,
-            FirstName = x.FirstName,
-            LastName = x.LastName,
-            FatherName = x.FatherName,
-            Position = x.Position,
-            Shifts = x.Shifts.Select(y => new ShiftResponse
-            {
-                Id = y.Id,
-                StartShift = y.StartShift,
-                EndShift = y.EndShift,
-                TotalHoursWorked = 0
-            }).ToList()
-        }).ToList();
-        
-        
-
+        var result = await _context.Employees.Include(x => x.Shifts).ToListAsync();
+        return result.Select(x => MapToEmployeeResponse(x)).ToList();
     }
 
     public List<Position> GetAllPositions()
     {
         var result = Enum.GetValues(typeof(Position)).Cast<Position>().ToList();
-        
+
         return result;
-        
+
         // var res = _context.Employees.
     }
 
-    public async Task<Employee> AddEmployee(CreateEmployeeRequest employee)
+    public async Task<EmployeeResponse> AddEmployee(CreateEmployeeRequest employee)
     {
+        if (employee == null ||string.IsNullOrEmpty(employee.FatherName) || string.IsNullOrEmpty(employee.FirstName)||
+            string.IsNullOrEmpty(employee.LastName) || employee.Position <= 0)
+            return null;
+        
+        
         var emplEntity = new Employee
         {
-
             FirstName = employee.FirstName,
             LastName = employee.LastName,
             FatherName = employee.FatherName,
             Position = employee.Position,
-
         };
         _context.Add(emplEntity);
         await _context.SaveChangesAsync();
-        return await _context.Employees.FirstAsync(x=>x.Id == emplEntity.Id);
+        var entity = await _context.Employees.FirstAsync(x => x.Id == emplEntity.Id);
+        return MapToEmployeeResponse(entity);
     }
 
-    
-
-    public async Task<Employee> UpdateEmployee(int id, UpdateEmployeeRequest request)
+    public async Task<EmployeeResponse> UpdateEmployee(int id, UpdateEmployeeRequest request)
     {
         var employeeToChange = await _context.Employees.FindAsync(id);
         if (employeeToChange is null)
@@ -106,47 +91,87 @@ public class EmployeeService : IEmployeeService
         employeeToChange.Position = request.Position;
 
         await _context.SaveChangesAsync();
-        return employeeToChange;
+        
+        
+        return MapToEmployeeResponse(employeeToChange);
     }
 
     public async Task<int> DeleteEmployee(int id)
     {
         var res = await _context.Employees.FindAsync(id);
-        
+
         _context.Remove(res);
         return await _context.SaveChangesAsync();
     }
 
-    public async Task<Employee> GetSingleEmployee(int id)
+    public async Task<EmployeeResponse> GetSingleEmployee(int id)
     {
         var result = await _context.Employees.FindAsync(id);
-        return result;
+        return MapToEmployeeResponse(result);
     }
 
-    public async Task<int> StartShift(StartShiftRequest request)
+    public async Task<int?> StartShift(StartShiftRequest request)
     {
         var id = request.Id;
-        var result = await _context.Employees.FirstOrDefaultAsync(x => x.Id == id);
-        result.Shifts.Add(new Shifts
+        var employee = await _context.Employees.Include(x => x.Shifts).FirstOrDefaultAsync(x => x.Id == id);
+        if (employee == null)
+        {
+            return null;
+        }
+
+        var areAllShiftsEnded = !employee.Shifts.Any(x => x.EndShift == null);
+        if (!areAllShiftsEnded) return null;
+
+
+        employee.Shifts.Add(new Shifts
         {
             Id = 0,
             StartShift = DateTime.Now,
             EndShift = null,
             TotalHoursWorked = 0,
         });
-        
+
+
         return await _context.SaveChangesAsync();
-        
     }
 
-    public async Task<int> EndShift(EndShiftRequest request)
+    public async Task<int?> EndShift(EndShiftRequest request)
     {
         var id = request.Id;
-        var result = await _context.Employees.Include(x=>x.Shifts).FirstOrDefaultAsync(x => x.Id == id);
-        var shift = result.Shifts.FirstOrDefault(x => x.EndShift == null);
+
+        var employee = await _context.Employees.Include(x => x.Shifts).FirstOrDefaultAsync(x => x.Id == id);
+
+        if (employee is null)
+        {
+            return null;
+        }
+        
+        var areAllShiftsStarted = !employee.Shifts.Any(x => x.StartShift == null);
+        if (!areAllShiftsStarted) return null;
+
+        var shift = employee.Shifts.FirstOrDefault(x => x.EndShift == null);
         shift.EndShift = request.EndShift;
         return await _context.SaveChangesAsync();
     }
-
     
+    
+    
+    private static EmployeeResponse MapToEmployeeResponse(Employee entity)
+    {
+        return new EmployeeResponse
+        {
+            Id = entity.Id,
+            FirstName = entity.FirstName,
+            LastName = entity.LastName,
+            FatherName = entity.FatherName,
+            Position = entity.Position,
+            Shifts = entity.Shifts.Select(y => new ShiftResponse
+            {
+                Id = y.Id,
+                StartShift = y.StartShift,
+                EndShift = y.EndShift,
+                TotalHoursWorked = 0
+            }).ToList()
+        };
+    }
 }

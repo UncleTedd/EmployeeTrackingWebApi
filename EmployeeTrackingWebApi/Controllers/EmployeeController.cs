@@ -1,5 +1,6 @@
 using EmployeeTrackingWebApi.Contracts;
 using EmployeeTrackingWebApi.Services;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeTrackingWebApi.Controllers;
@@ -14,34 +15,7 @@ public class EmployeeController : Controller
     {
         _employeeService = service;
     }
-    // public static List<Employee> Employees = new()
-    // {
-    //     new Employee()
-    //     {
-    //         Id = 1,
-    //         FirstName = "Osim",
-    //         LastName = "GUlakov",
-    //         FatherName = "Akbarovich",
-    //         Position = Position.Engineer
-    //     },
-    //     new Employee()
-    //     {
-    //         Id = 2,
-    //         FirstName = "Aziz",
-    //         LastName = "Gulakov",
-    //         FatherName = "Akbarovich", 
-    //         Position = Position.Manager
-    //     },
-    //     new Employee()
-    //     {
-    //         Id = 3,
-    //         FirstName = "Sam",
-    //         LastName = "Gulakov",
-    //         FatherName = "Akbarovich",
-    //         Position = Position.Tester
-    //     }
-    //
-    // };
+    
     [HttpGet]
     public async Task<ActionResult<List<EmployeeResponse>>> GetAllEmployee()
     {
@@ -56,9 +30,11 @@ public class EmployeeController : Controller
     }
     
     [HttpPost]
-    public async Task<ActionResult<Employee>> AddEmployee([FromBody] CreateEmployeeRequest request)
+    public async Task<ActionResult<EmployeeResponse>> AddEmployee([FromBody] CreateEmployeeRequest request)
     {
         var res= await _employeeService.AddEmployee(request);
+        if (res == null) return BadRequest();
+            
         return Ok(res);
     }
     [HttpDelete("{id}")]
@@ -69,26 +45,35 @@ public class EmployeeController : Controller
     }
     
     [HttpPut("{id}")]
-    public async Task<ActionResult<Employee>> UpdateEmployee(int id, UpdateEmployeeRequest request)
+    public async Task<ActionResult<EmployeeResponse>> UpdateEmployee(int id, UpdateEmployeeRequest request)
     {
         var result = await _employeeService.UpdateEmployee(id, request);
         return Ok(result);
 
     }
-    // [Route("[StartShift]")]
+    
     [HttpPost("startShift")]
     public async Task<ActionResult<Employee>> StartShift([FromBody]StartShiftRequest request)
     {
         var res = await _employeeService.StartShift(request);
+        if (res == null)
+        {
+            return BadRequest();
+        }
+        
         return Ok(res);
     }
     
     
-    // [Route("[EndShift]")]
+    
     [HttpPost("endShift")]
     public async Task<ActionResult<Employee>> EndShift([FromBody]EndShiftRequest request)
     {
         var res = await _employeeService.EndShift(request);
+        if (res == null)
+        {
+            return BadRequest();
+        }
         return Ok(res);
     }
     

@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace EmployeeTrackingWebApi.Contracts;
 
 public class CreateEmployeeRequest
