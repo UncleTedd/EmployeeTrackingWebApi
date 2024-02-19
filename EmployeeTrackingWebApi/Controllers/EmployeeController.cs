@@ -1,3 +1,4 @@
+using EmployeeTrackingWebApi.Contracts;
 using EmployeeTrackingWebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,20 +56,20 @@ public class EmployeeController : Controller
     }
     
     [HttpPost]
-    public async Task<ActionResult<Employee>> AddEmployee(Employee employee)
+    public async Task<ActionResult<Employee>> AddEmployee([FromBody] CreateEmployeeRequest request)
     {
-        var res= await _employeeService.AddEmployee(employee);
+        var res= await _employeeService.AddEmployee(request);
         return Ok(res);
     }
-    [HttpDelete]
-    public int DeleteEmployee(int id)
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<int>> DeleteEmployee([FromRoute]int id)
     {
-        return _employeeService.DeleteEmployee(id); 
+        return await _employeeService.DeleteEmployee(id); 
 
     }
     
     [HttpPut("{id}")]
-    public async Task<ActionResult<Employee>> UpdateEmployee(int id, Employee request)
+    public async Task<ActionResult<Employee>> UpdateEmployee(int id, UpdateEmployeeRequest request)
     {
         var result = await _employeeService.UpdateEmployee(id, request);
         return Ok(result);

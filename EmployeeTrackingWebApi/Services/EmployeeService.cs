@@ -1,5 +1,7 @@
+using EmployeeTrackingWebApi.Contracts;
 using EmployeeTrackingWebApi.DbContext;
 using EmployeeTrackingWebApi.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -58,16 +60,25 @@ public class EmployeeService : IEmployeeService
         // var res = _context.Employees.
     }
 
-    public async Task<Employee> AddEmployee(Employee employee)
+    public async Task<Employee> AddEmployee(CreateEmployeeRequest employee)
     {
-        _context.Add(employee);
+        var emplEntity = new Employee
+        {
+
+            FirstName = employee.FirstName,
+            LastName = employee.LastName,
+            FatherName = employee.FatherName,
+            Position = employee.Position,
+
+        };
+        _context.Add(emplEntity);
         await _context.SaveChangesAsync();
-        return await _context.Employees.FirstAsync(x => x.Id == employee.Id);
+        return await _context.Employees.FirstAsync(x=>x.Id == emplEntity.Id);
     }
 
     
 
-    public async Task<Employee> UpdateEmployee(int id, Employee request)
+    public async Task<Employee> UpdateEmployee(int id, UpdateEmployeeRequest request)
     {
         var employeeToChange = await _context.Employees.FindAsync(id);
         if (employeeToChange is null)
@@ -81,14 +92,12 @@ public class EmployeeService : IEmployeeService
         return employeeToChange;
     }
 
-    public int DeleteEmployee(int id)
+    public async Task<int> DeleteEmployee(int id)
     {
-        var res = Employees.Find(x => x.Id == id);
-        if (res is null)
-            return 0;
-
-        return Employees.Remove(res) ? 0 : 1;
-
+        var res = await _context.Employees.FindAsync(id);
+        
+        _context.Remove(res);
+        return await _context.SaveChangesAsync();
     }
 
     public async Task<Employee> GetSingleEmployee(int id)

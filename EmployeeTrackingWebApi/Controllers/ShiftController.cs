@@ -19,6 +19,10 @@ public class ShiftController : Controller
     
     public DateTime EndShift(int employeeId)
     {
+        employee.Shifts.Add(new Shifts()
+        {
+            EndShift = DateTime.Now
+        });
         return DateTime.Now;
     }
     

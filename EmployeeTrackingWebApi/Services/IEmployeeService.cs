@@ -1,3 +1,4 @@
+using EmployeeTrackingWebApi.Contracts;
 using EmployeeTrackingWebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +9,9 @@ public interface IEmployeeService
     Task<List<Employee>> GetAllEmployee();
     Task<Employee> GetSingleEmployee(int id);
     List<Position> GetAllPositions();
-    Task<Employee> AddEmployee(Employee employee);
-    Task<Employee> UpdateEmployee(int id, Employee request);
-    
-    int DeleteEmployee(int id);
+    Task<Employee> AddEmployee(CreateEmployeeRequest employee);
+    Task<Employee> UpdateEmployee(int id, UpdateEmployeeRequest request);
+
+    Task<int> DeleteEmployee(int id);
 
 }
