@@ -7,6 +7,5 @@ public class EmployeeResponse
     public string LastName { get; set; }
     public string FatherName { get; set; }
     public Position Position { get; set; }
-
     public List<ShiftResponse> Shifts { get; set; } = new();
 }

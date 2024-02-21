@@ -9,7 +9,4 @@ public class Employee
     public Position Position { get; set; }
 
     public List<Shifts> Shifts { get; set; } = new();
-
-
-
 }

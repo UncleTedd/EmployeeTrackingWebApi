@@ -17,18 +17,18 @@ public class EmployeeService : IEmployeeService
     public async Task<List<EmployeeResponse>> GetEmployees()
     {
         var result = await _context.Employees.Include(x => x.Shifts).ToListAsync();
+
         return result.Select(x => MapToEmployeeResponse(x)).ToList();
     }
 
-    
+
     public async Task<EmployeeResponse> GetEmployee(int id)
     {
-        var result = await _context.Employees.Include(x=>x.Shifts).FirstOrDefaultAsync();
+        var result = await _context.Employees.Include(x => x.Shifts).FirstOrDefaultAsync();
         return MapToEmployeeResponse(result);
     }
-    
-    
-    
+
+
     public List<Position> GetAllPositions()
     {
         var result = Enum.GetValues(typeof(Position)).Cast<Position>().ToList();
@@ -80,7 +80,6 @@ public class EmployeeService : IEmployeeService
         return await _context.SaveChangesAsync();
     }
 
-    
 
     public async Task<int?> StartShift(StartShiftRequest request)
     {
