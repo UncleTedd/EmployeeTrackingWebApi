@@ -1,13 +1,13 @@
 namespace EmployeeTrackingWebApi.DbContext;
+
 using Microsoft.EntityFrameworkCore;
 
 public class DataContext : DbContext
 {
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
-        
     }
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
@@ -16,5 +16,4 @@ public class DataContext : DbContext
     }
 
     public DbSet<Employee> Employees { get; set; }
-    
 }

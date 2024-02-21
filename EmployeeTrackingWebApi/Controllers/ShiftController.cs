@@ -5,7 +5,7 @@ namespace EmployeeTrackingWebApi.Controllers;
 public class ShiftController : Controller
 {
     private Employee employee = new Employee();
-    
+
     public DateTime StartShift(int employeeId)
     {
         employee.Shifts.Add(new Shifts
@@ -16,7 +16,7 @@ public class ShiftController : Controller
         });
         return DateTime.Now;
     }
-    
+
     public DateTime EndShift(int employeeId)
     {
         employee.Shifts.Add(new Shifts()
@@ -25,5 +25,4 @@ public class ShiftController : Controller
         });
         return DateTime.Now;
     }
-    
 }

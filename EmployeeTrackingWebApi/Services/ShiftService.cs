@@ -11,8 +11,6 @@ public class ShiftService : IShiftService
         _context = context;
     }
     
-    
-    
     public DateTime StartShift(int id)
     {
         return DateTime.Now;
@@ -23,7 +21,7 @@ public class ShiftService : IShiftService
         return DateTime.Now;
     }
 
-    public int totalHoursWorked()
+    public double totalHoursWorked()
     {
         return 0;
     }

@@ -1,9 +1,6 @@
 using System.Xml.Linq;
 using EmployeeTrackingWebApi.Contracts;
 using EmployeeTrackingWebApi.DbContext;
-using EmployeeTrackingWebApi.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeTrackingWebApi.Services;
@@ -17,56 +14,35 @@ public class EmployeeService : IEmployeeService
         _context = context;
     }
 
-    // public static List<Employee> Employees = new()
-    // {
-    //     new Employee()
-    //     {
-    //         Id = 1,
-    //         FirstName = "Osim",
-    //         LastName = "GUlakov",
-    //         FatherName = "Akbarovich",
-    //         Position = Position.Engineer
-    //     },
-    //     new Employee()
-    //     {
-    //         Id = 2,
-    //         FirstName = "Aziz",
-    //         LastName = "Gulakov",
-    //         FatherName = "Akbarovich",
-    //         Position = Position.Manager
-    //     },
-    //     new Employee()
-    //     {
-    //         Id = 3,
-    //         FirstName = "Sam",
-    //         LastName = "Gulakov",
-    //         FatherName = "Akbarovich",
-    //         Position = Position.Tester
-    //     }
-    //
-    // };
     public async Task<List<EmployeeResponse>> GetAllEmployee()
     {
         var result = await _context.Employees.Include(x => x.Shifts).ToListAsync();
         return result.Select(x => MapToEmployeeResponse(x)).ToList();
     }
 
+    
+    public async Task<EmployeeResponse> GetSingleEmployee(int id)
+    {
+        var result = await _context.Employees.Include(x=>x.Shifts).FirstOrDefaultAsync();
+        return MapToEmployeeResponse(result);
+    }
+    
+    
+    
     public List<Position> GetAllPositions()
     {
         var result = Enum.GetValues(typeof(Position)).Cast<Position>().ToList();
 
         return result;
-
-        // var res = _context.Employees.
     }
 
     public async Task<EmployeeResponse> AddEmployee(CreateEmployeeRequest employee)
     {
-        if (employee == null ||string.IsNullOrEmpty(employee.FatherName) || string.IsNullOrEmpty(employee.FirstName)||
+        if (employee == null || string.IsNullOrEmpty(employee.FatherName) || string.IsNullOrEmpty(employee.FirstName) ||
             string.IsNullOrEmpty(employee.LastName) || employee.Position <= 0)
             return null;
-        
-        
+
+
         var emplEntity = new Employee
         {
             FirstName = employee.FirstName,
@@ -91,8 +67,8 @@ public class EmployeeService : IEmployeeService
         employeeToChange.Position = request.Position;
 
         await _context.SaveChangesAsync();
-        
-        
+
+
         return MapToEmployeeResponse(employeeToChange);
     }
 
@@ -104,11 +80,7 @@ public class EmployeeService : IEmployeeService
         return await _context.SaveChangesAsync();
     }
 
-    public async Task<EmployeeResponse> GetSingleEmployee(int id)
-    {
-        var result = await _context.Employees.FindAsync(id);
-        return MapToEmployeeResponse(result);
-    }
+    
 
     public async Task<int?> StartShift(StartShiftRequest request)
     {
@@ -145,17 +117,20 @@ public class EmployeeService : IEmployeeService
         {
             return null;
         }
-        
+
         var areAllShiftsStarted = !employee.Shifts.Any(x => x.StartShift == null);
         if (!areAllShiftsStarted) return null;
 
         var shift = employee.Shifts.FirstOrDefault(x => x.EndShift == null);
         shift.EndShift = request.EndShift;
+        var totalMinutes = (shift.EndShift - shift.StartShift)?.TotalMinutes;
+        var result = totalMinutes / 60d;
+        var totalHours = Math.Round(result.Value, 2);
+        shift.TotalHoursWorked = totalHours;
         return await _context.SaveChangesAsync();
     }
-    
-    
-    
+
+
     private static EmployeeResponse MapToEmployeeResponse(Employee entity)
     {
         return new EmployeeResponse
@@ -170,7 +145,7 @@ public class EmployeeService : IEmployeeService
                 Id = y.Id,
                 StartShift = y.StartShift,
                 EndShift = y.EndShift,
-                TotalHoursWorked = 0
+                TotalHoursWorked = y.TotalHoursWorked
             }).ToList()
         };
     }

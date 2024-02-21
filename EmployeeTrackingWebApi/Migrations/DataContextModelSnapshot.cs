@@ -60,8 +60,8 @@ namespace EmployeeTrackingWebApi.Migrations
                     b.Property<DateTime?>("StartShift")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("TotalHoursWorked")
-                        .HasColumnType("int");
+                    b.Property<double>("TotalHoursWorked")
+                        .HasColumnType("double");
 
                     b.HasKey("Id");
 
