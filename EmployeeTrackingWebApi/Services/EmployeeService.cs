@@ -14,14 +14,14 @@ public class EmployeeService : IEmployeeService
         _context = context;
     }
 
-    public async Task<List<EmployeeResponse>> GetAllEmployee()
+    public async Task<List<EmployeeResponse>> GetEmployees()
     {
         var result = await _context.Employees.Include(x => x.Shifts).ToListAsync();
         return result.Select(x => MapToEmployeeResponse(x)).ToList();
     }
 
     
-    public async Task<EmployeeResponse> GetSingleEmployee(int id)
+    public async Task<EmployeeResponse> GetEmployee(int id)
     {
         var result = await _context.Employees.Include(x=>x.Shifts).FirstOrDefaultAsync();
         return MapToEmployeeResponse(result);

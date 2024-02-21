@@ -4,11 +4,11 @@ namespace EmployeeTrackingWebApi.Controllers;
 
 public class ShiftController : Controller
 {
-    private Employee employee = new Employee();
+    private readonly Employee _employee = new();
 
     public DateTime StartShift(int employeeId)
     {
-        employee.Shifts.Add(new Shifts
+        _employee.Shifts.Add(new Shifts
         {
             StartShift = DateTime.Now,
             EndShift = null,
@@ -19,7 +19,7 @@ public class ShiftController : Controller
 
     public DateTime EndShift(int employeeId)
     {
-        employee.Shifts.Add(new Shifts()
+        _employee.Shifts.Add(new Shifts()
         {
             EndShift = DateTime.Now
         });

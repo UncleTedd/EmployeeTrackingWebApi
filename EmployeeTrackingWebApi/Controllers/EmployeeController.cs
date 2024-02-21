@@ -18,13 +18,13 @@ public class EmployeeController : Controller
     [HttpGet]
     public async Task<ActionResult<List<EmployeeResponse>>> GetAllEmployee()
     {
-        return await _employeeService.GetAllEmployee();
+        return await _employeeService.GetEmployees();
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<Employee>> GetSingleEmployee(int id)
+    public async Task<ActionResult<Employee>> GetEmployee(int id)
     {
-        var res = await _employeeService.GetSingleEmployee(id);
+        var res = await _employeeService.GetEmployee(id);
         return Ok(res);
     }
 

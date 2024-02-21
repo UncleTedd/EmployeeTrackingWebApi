@@ -6,8 +6,8 @@ namespace EmployeeTrackingWebApi.Services;
 
 public interface IEmployeeService
 {
-    Task<List<EmployeeResponse>> GetAllEmployee();
-    Task<EmployeeResponse> GetSingleEmployee(int id);
+    Task<List<EmployeeResponse>> GetEmployees();
+    Task<EmployeeResponse> GetEmployee(int id);
     List<Position> GetAllPositions();
     Task<EmployeeResponse> AddEmployee(CreateEmployeeRequest employee);
     Task<EmployeeResponse> UpdateEmployee(int id, UpdateEmployeeRequest request);
